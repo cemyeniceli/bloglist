@@ -9,14 +9,14 @@ blogsRouter.get('/', (request, response, next) => {
 		.catch(error => next(error))
 })
 
-app.get('/:id', (request, response, next) => {
+blogsRouter.get('/:id', (request, response, next) => {
 	const id =request.params.id
 	Blog.findById(id)
 		.then(blog => blog ? response.json(blog) : response.status(404).end())
 		.catch(error => next(error))
 })
 
-app.delete('/:id', (request, response, next) => {
+blogsRouter.delete('/:id', (request, response, next) => {
 	const id = request.params.id
 	Blog.findByIdAndRemove(id)
 		.then(result => {
@@ -25,18 +25,7 @@ app.delete('/:id', (request, response, next) => {
 		.catch(error => next(error))
 })
 
-app.get('/info', (request, response, next) => {
-	Blog.find({})
-		.then(blogs => {
-			const numberOfRecords = blogs.length
-			const date = new Date()
-			response.send(`<p>Blog list has info for ${numberOfRecords} blogs</p><p>${date}</>`)
-		})
-		.catch(error => {next(error)
-		}) 
-})
-
-app.put('/:id', (request, response, next) => {
+blogsRouter.put('/:id', (request, response, next) => {
 	const body = request.body
 
 	const blog = {
@@ -55,7 +44,7 @@ app.put('/:id', (request, response, next) => {
 		.catch(error => next(error))
 })
 
-app.post('/', (request, response, next) => {
+blogsRouter.post('/', (request, response, next) => {
 	const blog = request.body
 
 	const newPerson = new Blog(blog)

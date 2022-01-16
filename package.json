@@ -4,7 +4,11 @@
   "description": "lists blogs with likes",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
@@ -21,6 +25,7 @@
     "dotenv": "^12.0.4",
     "express": "^4.17.2",
     "mongoose": "^6.1.6",
+    "mongoose-unique-validator": "^3.0.0",
     "morgan": "^1.10.0"
   },
   "devDependencies": {

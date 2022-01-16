@@ -1,0 +1,23 @@
+GET http://localhost:3003/api/blogs
+###
+GET http://localhost:3003/api/blogs/61e437c448e5ec005e27b123
+###
+DELETE http://localhost:3003/api/blogs/61e437c448e5ec005e27b123
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+    "title": "Cem Yeniceli",
+    "author": "Cem Yeniceli",
+    "url": "CemYeniceli.io",
+    "likes": 7
+}
+###
+PUT http://localhost:3003/api/blogs/61e31e8f1e3f595d90eb3705
+Content-Type: application/json
+
+{
+    "name": "Cem Yeniceli",
+    "number": "34-56-78-90"
+}
