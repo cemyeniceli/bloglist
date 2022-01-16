@@ -1,0 +1,30 @@
+{
+  "name": "bloglist",
+  "version": "1.0.0",
+  "description": "lists blogs with likes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cemyeniceli/bloglist.git"
+  },
+  "author": "Cem Yeniceli",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cemyeniceli/bloglist/issues"
+  },
+  "homepage": "https://github.com/cemyeniceli/bloglist#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^12.0.4",
+    "express": "^4.17.2",
+    "mongoose": "^6.1.6",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.7.0",
+    "nodemon": "^2.0.15"
+  }
+}
