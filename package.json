@@ -4,9 +4,9 @@
   "description": "lists blogs with likes",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "jest --verbose",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -29,11 +29,10 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^8.7.0",
     "jest": "^27.4.7",
-    "nodemon": "^2.0.15"
-  },
-  "jest": {
-    "testEnvironment": "node"
+    "nodemon": "^2.0.15",
+    "supertest": "^6.2.1"
   }
 }

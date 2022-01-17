@@ -8,10 +8,10 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Cem Yeniceli",
+    "title": "Rex Yeniceli",
     "author": "Cem Yeniceli",
     "url": "CemYeniceli.io",
-    "likes": 7
+    "likes": 70
 }
 ###
 PUT http://localhost:3003/api/blogs/61e31e8f1e3f595d90eb3705

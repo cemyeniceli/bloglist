@@ -5,19 +5,17 @@ const blogSchema = new mongoose.Schema({
     title: {
 		type: String,
 		minlength: 3,
+		unique: true,
 		required: true
 	},
     author: {
 		type: String,
 		minlength: 3,
-		unique: true,
-		uniqueCaseInsensitive: true,
 		required: true
 	},
     url: {
 		type: String,
 		minlength: 5,
-		unique: true,
 		required: true
 	},
     likes: {
