@@ -8,16 +8,20 @@ POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Rex Yeniceli",
+    "title": "Rex Yeniceli - 3",
     "author": "Cem Yeniceli",
     "url": "CemYeniceli.io",
-    "likes": 70
+    "likes": 70,
+    "userId": "61e6d9ddacfc5782e2e15c06"
 }
 ###
-PUT http://localhost:3003/api/blogs/61e31e8f1e3f595d90eb3705
+POST http://localhost:3003/api/users
 Content-Type: application/json
 
 {
-    "name": "Cem Yeniceli",
-    "number": "34-56-78-90"
+    "username": "rexyeniceli",
+    "name": "Rex Yeniceli",
+    "password": "madrex" 
 }
+###
+GET http://localhost:3003/api/users
