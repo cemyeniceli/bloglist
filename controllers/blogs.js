@@ -1,59 +1,47 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 
-blogsRouter.get('/', (request, response, next) => {
-	Blog.find({})
-		.then(blogs => {
-			response.json(blogs)
-		})
-		.catch(error => next(error))
+blogsRouter.get('/', async (request, response, next) => {
+	const blogs = await Blog.find({})
+	response.json(blogs)
 })
 
-blogsRouter.get('/:id', (request, response, next) => {
-	const id =request.params.id
-	Blog.findById(id)
-		.then(blog => blog ? response.json(blog) : response.status(404).end())
-		.catch(error => next(error))
+blogsRouter.get('/:id', async (request, response, next) => {
+	const blog = await Blog.findById(request.params.id)
+	if (blog) {
+		response.json(blog)
+	} else {
+		response.status(404).end()
+	}
 })
 
-blogsRouter.delete('/:id', (request, response, next) => {
-	const id = request.params.id
-	Blog.findByIdAndRemove(id)
-		.then(result => {
-			result ? response.status(204).end() : response.status(404).send({error: 'Blog does not exists'})
-		})
-		.catch(error => next(error))
+blogsRouter.delete('/:id', async (request, response, next) => {
+	const result = await Blog.findByIdAndRemove(request.params.id)
+	if (result) {
+		response.status(204).end()
+	} else {
+		response.status(404).send({error: 'Blog does not exists'})
+	}
 })
 
-blogsRouter.put('/:id', (request, response, next) => {
+blogsRouter.put('/:id', async (request, response, next) => {
 	const body = request.body
-
 	const blog = {
 	    title: body.title,
         author: body.author,
         url: body.url,
         likes: body.likes
 	}
-    
-	Blog.findByIdAndUpdate(request.params.id,
-		blog, 
-		{ new: true })
-		.then(updatedPerson => {
-			response.json(updatedPerson)
-		})
-		.catch(error => next(error))
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {new:true})
+	response.json(updatedBlog)
 })
 
-blogsRouter.post('/', (request, response, next) => {
+blogsRouter.post('/', async (request, response, next) => {
 	const blog = request.body
 
 	const newPerson = new Blog(blog)
-
-	newPerson.save()
-		.then(result => {
-			response.json(result)
-		})
-		.catch(error => next(error))  
+	const result = await newPerson.save()
+	response.json(result)
 })
 
 module.exports = blogsRouter
