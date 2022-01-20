@@ -2,26 +2,34 @@ GET http://localhost:3003/api/blogs
 ###
 GET http://localhost:3003/api/blogs/61e437c448e5ec005e27b123
 ###
-DELETE http://localhost:3003/api/blogs/61e437c448e5ec005e27b123
-###
-POST http://localhost:3003/api/blogs
-Content-Type: application/json
-
-{
-    "title": "Rex Yeniceli - 3",
-    "author": "Cem Yeniceli",
-    "url": "CemYeniceli.io",
-    "likes": 70,
-    "userId": "61e6d9ddacfc5782e2e15c06"
-}
+DELETE http://localhost:3003/api/blogs/61e7faf3ff9ea17d01cc29b5
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJleHllbmljZWxpIiwiaWQiOiI2MWU3ZWUzMzkwOTllZTA2MzI1MTgwYTgiLCJpYXQiOjE2NDI2MDkwMzUsImV4cCI6MTY0MjYxMjYzNX0.PTs23ezUo4Ka-oC7M2pwulan0ROCM3bGFLU0KGnFKJs
 ###
 POST http://localhost:3003/api/users
 Content-Type: application/json
 
 {
-    "username": "rexyeniceli",
-    "name": "Rex Yeniceli",
+    "username": "cemyeniceli",
+    "name": "Cem Yeniceli",
     "password": "madrex" 
 }
 ###
 GET http://localhost:3003/api/users
+###
+POST http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+    "username": "rexyeniceli",
+    "password": "madrex" 
+}
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJleHllbmljZWxpIiwiaWQiOiI2MWU3ZWUzMzkwOTllZTA2MzI1MTgwYTgiLCJpYXQiOjE2NDI2MDkwMzUsImV4cCI6MTY0MjYxMjYzNX0.PTs23ezUo4Ka-oC7M2pwulan0ROCM3bGFLU0KGnFKJs
+
+{
+    "title": "Rex Yeniceli - 4",
+    "url": "RemYeniceli.io",
+    "likes": 2
+}

@@ -74,6 +74,70 @@ describe('when there is initially one user in db', () => {
         const usersAtEnd = await helper.usersInDb()
         expect(usersAtEnd).toHaveLength(usersAtStart.length)
     })
+    test('creation fails with proper statuscode and message if password is less than 3 characters', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const newUser = {
+            username: 'root2',
+            name: 'Cem Yeniceli',
+            password: 'ro' 
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+        const errorMessage = result.body.error
+        expect(errorMessage).toBe('password length should be at 3 characters long')
+    })
+    test('creation fails with proper statuscode and message if username is less than 3 characters', async () => {
+        const usersAtStart = await helper.usersInDb()
+
+        const newUser = {
+            username: 'as',
+            name: 'Cem Yeniceli',
+            password: 'rodsd' 
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        const usersAtEnd = await helper.usersInDb()
+        expect(usersAtEnd).toHaveLength(usersAtStart.length)
+        const errorMessage = result.body.error
+        expect(errorMessage).toContain('User validation')
+    })
+    test('user can login with correct password', async () => {
+        const result = await api
+            .post('/api/login')
+            .send({username: 'root', password:'sekret'})
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+        expect(result.body.token).toBeDefined()
+    })
+    test('login fails with 401 with wrong password', async () => {
+        const result = await api
+            .post('/api/login')
+            .send({username: 'root', password:'wrongPass'})
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+        expect(result.body.error).toContain('invalid username or password')    
+    })
+    test('login fails with 401 with wrong username', async () => {
+        const result = await api
+            .post('/api/login')
+            .send({username: 'wrongUser', password:'sekret'})
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+        expect(result.body.error).toContain('invalid username or password')    
+    })   
 })
 
 
