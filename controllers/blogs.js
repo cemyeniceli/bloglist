@@ -1,6 +1,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const middleware = require('../utils/middleware')
 
 blogsRouter.get('/', async (request, response) => {
 	const blogs = await Blog.find({}).populate('user', {username:1, name:1})
@@ -16,10 +17,21 @@ blogsRouter.get('/:id', async (request, response) => {
 	}
 })
 
-blogsRouter.delete('/:id', async (request, response) => {
-	const result = await Blog.findByIdAndRemove(request.params.id)
-	if (result) {
-		response.status(204).end()
+blogsRouter.delete('/:id', middleware.userExtractor, async (request, response) => {
+	
+	const user = request.user
+	const blog = await Blog.findById(request.params.id)
+
+	if (blog) {
+		if (blog.user.toString() === user._id.toString()) {
+			await Blog.findByIdAndRemove(request.params.id)
+			const blogIndex = user.blogs.indexOf(blog._id)
+			user.blogs.splice(blogIndex,1)
+			await User.replaceOne({_id:user._id},user)
+			response.status(204).end()
+		} else {
+			response.status(401).send({error: 'User is not allowed to delete this blog'})	
+		}
 	} else {
 		response.status(404).send({error: 'Blog does not exists'})
 	}
@@ -37,18 +49,17 @@ blogsRouter.put('/:id', async (request, response) => {
 	response.json(updatedBlog)
 })
 
-blogsRouter.post('/', async (request, response) => {
-	const body = request.body
+blogsRouter.post('/', middleware.userExtractor, async (request, response) => {
+	const body = request.body 
 
-	const user = await User.findById(body.userId)
-
+	const user = request.user
 	const newBlog = new Blog({
 		...body,
 		user: user._id
 	})
 	const savedBlog = await newBlog.save()
 	user.blogs = user.blogs.concat(savedBlog._id)
-	await user.save()
+	await User.replaceOne({_id:user._id},user)
 	response.json(savedBlog)
 })
 

@@ -2,13 +2,20 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const helper = require('./test_helper')
+const bcrypt = require('bcrypt')
+
 
 const api = supertest(app)
 
 beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
+    await User.deleteMany({})
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'root', name: 'root', passwordHash })
+    await user.save()
 })
 
 describe('when there is initially some blogs saved', () => {
@@ -47,14 +54,16 @@ describe('when there is initially some blogs saved', () => {
 
 describe('addition of a new blog', () => {
     test('a valid blog can be added', async () => {
+        const token = await helper.tokenFromUser({username: 'root', password:'sekret'}, api)
         const newBlog = {
-            title: "React rocks",
-            author: "Michael Cem",
-            url: "https://reactpatterns.com/",
-            likes: 1
+            title: "React by Cem",
+            author: 'Cem Yeniceli',
+            url: "https://reactyeniceli.com/",
+            likes: 100
         }
         await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(200)
             .expect('Content-Type', /application\/json/)
@@ -63,10 +72,11 @@ describe('addition of a new blog', () => {
         const titles = blogsAtEnd.map(r => r.title)
 
         expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
-        expect(titles).toContain('React rocks')
+        expect(titles).toContain('React by Cem')
     },100000)
 
     test('a blog without author is not added', async () => {
+        const token = await helper.tokenFromUser({username: 'root', password:'sekret'}, api)
         const newBlog = {
             title: "React rocks",
             url: "https://reactpatterns.com/",
@@ -74,6 +84,7 @@ describe('addition of a new blog', () => {
         }
         await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(400)
 
@@ -83,6 +94,7 @@ describe('addition of a new blog', () => {
     },100000)
 
     test('a blog without title is not added', async () => {
+        const token = await helper.tokenFromUser({username: 'root', password:'sekret'}, api)
         const newBlog = {
             author: "React Rects",
             url: "https://reactpatterns.com/",
@@ -90,6 +102,7 @@ describe('addition of a new blog', () => {
         }
         await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(400)
 
@@ -99,6 +112,7 @@ describe('addition of a new blog', () => {
     },100000)
 
     test('a blog without url is not added', async () => {
+        const token = await helper.tokenFromUser({username: 'root', password:'sekret'}, api)
         const newBlog = {
             title: "React rocks",
             author: "https://reactpatterns.com/",
@@ -106,6 +120,7 @@ describe('addition of a new blog', () => {
         }
         await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(400)
 
@@ -115,6 +130,7 @@ describe('addition of a new blog', () => {
     },100000)
 
     test('a blog without likes defined will default to zero like and added', async () => {
+        const token = await helper.tokenFromUser({username: 'root', password:'sekret'}, api)
         const newBlog = {
             title: "React rocks",
             url: "https://reactpatterns.com/",
@@ -122,6 +138,7 @@ describe('addition of a new blog', () => {
         }
         const resultBlog = await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(200)
 
@@ -165,35 +182,81 @@ describe('viewing a specific blog', () => {
 })
 
 describe('deleting a blog', () => {
-    test('success with 204 if id is valid', async () => {
-        const blogsAtStart = await helper.blogsInDb()
-        const blogToDelete = blogsAtStart[0]
-
+    test('success with 204 if the creator of the blog deletes', async () => {
+        const newBlog = {
+            title: "React by Cem",
+            author: 'Cem Yeniceli',
+            url: "https://reactyeniceli.com/",
+            likes: 100
+        }
+        const token = await helper.tokenFromUser({username: 'root', password:'sekret'}, api)
+        const blogToDelete = await api
+            .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
+            .send(newBlog)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+        
         await api
-            .delete(`/api/blogs/${blogToDelete.id}`)
+            .delete(`/api/blogs/${blogToDelete.body.id}`)
+            .set('Authorization', 'bearer ' + token)
             .expect(204)
         
         const blogsAtEnd = await helper.blogsInDb()
-        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1)
+        expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
 
         const titles = blogsAtEnd.map(r => r.title)
-        expect(titles).not.toContain(blogToDelete.title)
+        expect(titles).not.toContain(blogToDelete.body.title)
     })
 
-    test('fails with 404 if id does not exists', async () => {
+    test('fails with 404 if blog id does not exists', async () => {
         const nonExistingId = await helper.nonExistingId()
+        const token = await helper.tokenFromUser({username: 'root', password:'sekret'}, api)
 
         await api
             .delete(`/api/blogs/${nonExistingId}`)
+            .set('Authorization', 'bearer ' + token)
             .expect(404)
     })
 
-    test('fails with 400 if id is invalid', async () => {
+    test('fails with 400 if blog id is invalid', async () => {
         const invalidId = '5a3d5da59070081a82a3445'
+        const token = await helper.tokenFromUser({username: 'root', password:'sekret'}, api)
 
         await api
             .delete(`/api/blogs/${invalidId}`)
+            .set('Authorization', 'bearer ' + token)
             .expect(400)
+    })
+
+    test('fails with 401 if user id is invalid', async () => {
+        // Create new user
+        const passwordHash = await bcrypt.hash('sekret1', 10)
+        const user = new User({ username: 'root1', name: 'root1', passwordHash })
+        await user.save()
+
+        const correctToken = await helper.tokenFromUser({username: 'root', password:'sekret'}, api)
+        const wrongToken = await helper.tokenFromUser({username: 'root1', password:'sekret1'}, api)
+
+        // Create a blog with correct token
+        const newBlog = {
+            title: "React by Cem",
+            author: 'Cem Yeniceli',
+            url: "https://reactyeniceli.com/",
+            likes: 100
+        }
+        const blogToDelete = await api
+            .post('/api/blogs')
+            .set('Authorization', 'bearer ' + correctToken)
+            .send(newBlog)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+        
+        // try to delete it with wrong token
+        await api
+            .delete(`/api/blogs/${blogToDelete.body.id}`)
+            .set('Authorization', 'bearer ' + wrongToken)
+            .expect(401)
     })
 })
 
