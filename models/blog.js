@@ -2,23 +2,23 @@ const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
 const blogSchema = new mongoose.Schema({
-    title: {
+	title: {
 		type: String,
 		minlength: 3,
 		unique: true,
 		required: true
 	},
-    author: {
+	author: {
 		type: String,
 		minlength: 3,
 		required: true
 	},
-    url: {
+	url: {
 		type: String,
 		minlength: 5,
 		required: true
 	},
-    likes: {
+	likes: {
 		type: Number,
 		default: 0
 	},
