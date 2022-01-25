@@ -20,6 +20,9 @@ beforeEach(async () => {
 		return {...blog, user:userId}
 	})
 	await Blog.insertMany(blogsWithUser)
+	const blogs = await helper.blogsInDb()
+	const blogIdList = blogs.map(blog => blog.id)
+	await user.updateOne({blogs:blogIdList}) 
 })
 
 describe('when there is initially some blogs saved', () => {
