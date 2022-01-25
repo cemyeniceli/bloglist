@@ -286,11 +286,10 @@ describe('updating a specific blog', () => {
 			.expect('Content-Type', /application\/json/)
 
 		const blogsAtEnd = await helper.blogsInDb()
-		const updatedBlogAtEnd = blogsAtEnd[0]
-
-		expect(updatedBlog.body).toEqual(updatedBlogAtEnd)
-		expect(blogUpdate.title).toBe(updatedBlogAtEnd.title)
-		expect(blogUpdate.likes).toBe(updatedBlog.body.likes)
+		const updatedBlogAtEnd = {...blogsAtEnd[0], user:blogsAtEnd[0].user.toString()}
+		const updatedData = {...updatedBlog.body, user:updatedBlog.body.user.toString()}	
+		
+		expect(updatedBlogAtEnd).toEqual(updatedData)
 	})
 
 	test('a specific blog is updated with only likes', async () => {
@@ -308,10 +307,10 @@ describe('updating a specific blog', () => {
 			.expect('Content-Type', /application\/json/)
 
 		const blogsAtEnd = await helper.blogsInDb()
-		const updatedBlogAtEnd = blogsAtEnd[0]
+		const updatedBlogAtEnd = {...blogsAtEnd[0], user:blogsAtEnd[0].user.toString()}
+		const updatedData = {...updatedBlog.body, user:updatedBlog.body.user.toString()}	
 
-		expect(updatedBlog.body).toEqual(updatedBlogAtEnd)
-		expect(blogUpdate.likes).toBe(updatedBlog.body.likes)
+		expect(updatedBlogAtEnd).toEqual(updatedData)
 	})
 })
 
