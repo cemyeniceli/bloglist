@@ -11,11 +11,15 @@ const api = supertest(app)
 
 beforeEach(async () => {
 	await Blog.deleteMany({})
-	await Blog.insertMany(helper.initialBlogs)
 	await User.deleteMany({})
 	const passwordHash = await bcrypt.hash('sekret', 10)
 	const user = new User({ username: 'root', name: 'root', passwordHash })
 	await user.save()
+	const userId = user._id.toString()
+	const blogsWithUser = helper.initialBlogs.map(blog => {
+		return {...blog, user:userId}
+	})
+	await Blog.insertMany(blogsWithUser)
 })
 
 describe('when there is initially some blogs saved', () => {
